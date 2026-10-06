@@ -25,7 +25,10 @@ A new sound: any short id (lowercase letters, digits, dashes), added to the cata
 
 ## The sounds
 
-- **Ogg Opus, mono, 48 kbps** (Ogg Vorbis also works). About 360 KB a minute.
+- **Ogg Opus, mono 48 kbps or stereo 64 kbps** (stereo where the width matters, as rain on headphones). About 360–480 KB
+  a minute. `./prepare-sound.sh original.ogg <id>` does all of this: it softens the peaks a little, brings the sound to
+  −23 LUFS with one fixed gain, keeps the loop's seam even (it processes three copies and keeps the middle one) and writes
+  `files/<id>.ogg`, then shows the loudness and the seam.
 - **30–90 seconds, made to loop**: the end runs into the start without a click or a change in level (in Audacity:
   cross-fade the last two seconds into the first two, then cut). The app repeats the file.
 - **Even loudness**: normalise every file to about −23 LUFS so no sound is much louder than another.
@@ -37,6 +40,12 @@ A new sound: any short id (lowercase letters, digits, dashes), added to the cata
 
 - **Square JPEG, 512 × 512, quality about 80** (50–80 KB). Shown as the sound's album art in Now Playing, the
   notification and on the lock screen. Same licence rules as the sounds.
+
+## The sounds so far
+
+| Id | Source | Licence |
+|---|---|---|
+| storm | [Nox_Sound, Freesound 553887](https://freesound.org/people/Nox_Sound/sounds/553887/): rain, thunder and a fire, indoors | CC0 |
 
 ## When the files are in
 
