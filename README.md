@@ -21,7 +21,11 @@ files/stream.ogg      files/stream.jpg
 files/fan.ogg         files/fan.jpg
 ```
 
-A new sound: any short id (lowercase letters, digits, dashes), added to the catalog with its name and licence.
+A sound can have several recordings: `storm.ogg`, `storm-2.ogg`, `storm-3.ogg`, ... The app downloads them all
+together, shows how many it has under the tile, plays one at random (never the same twice in a row) and changes to
+another on next or previous. Each recording has its own licence, credit and page in the catalog.
+
+A new sound: any short id (lowercase letters, digits, dashes), added to the catalog with its name.
 
 ## The sounds
 
@@ -43,14 +47,15 @@ A new sound: any short id (lowercase letters, digits, dashes), added to the cata
 
 ## The sounds so far
 
-| Id | Source | Licence |
+| File | Source | Licence |
 |---|---|---|
-| storm | [Nox_Sound, Freesound 553887](https://freesound.org/people/Nox_Sound/sounds/553887/): rain, thunder and a fire, indoors | CC0 |
+| storm.ogg | [Nox_Sound, Freesound 553887](https://freesound.org/people/Nox_Sound/sounds/553887/): rain, thunder and a fire, indoors | CC0 |
 
 ## When the files are in
 
-Run `python3 make-catalog.py`: it fills in each file's size and SHA-256 in the app's catalog (the app checks every
-download against them, so a changed or broken file is never used), and lists files that are missing or unknown.
+Run `python3 make-catalog.py`: it adds each sound's recordings to the app's catalog with their size and SHA-256 (the
+app checks every download against them, so a changed or broken file is never used), keeps the licences, credits and
+pages already there, and lists what still needs one, and files that are unknown.
 
 Then publish: create the public repository `still-sounds`, commit `files/`, tag it `v1`, and make a GitHub release
 `v1` with the same files attached. The catalog lists two mirrors, tried in order: the release, then jsDelivr
