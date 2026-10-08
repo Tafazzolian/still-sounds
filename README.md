@@ -15,10 +15,10 @@ files/storm.ogg       files/storm.jpg
 files/fireplace.ogg   files/fireplace.jpg
 files/wind.ogg        files/wind.jpg
 files/birds.ogg       files/birds.jpg
-files/crickets.ogg    files/crickets.jpg
+files/night.ogg       files/night.jpg
 files/waves.ogg       files/waves.jpg
 files/stream.ogg      files/stream.jpg
-files/fan.ogg         files/fan.jpg
+files/noise.ogg       files/noise.jpg
 ```
 
 A sound can have several recordings: `storm.ogg`, `storm-2.ogg`, `storm-3.ogg`, ... The app downloads them all

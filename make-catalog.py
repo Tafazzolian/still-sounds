@@ -4,8 +4,9 @@
 Usage: python3 make-catalog.py
 The catalog is the app's still/src/main/assets/ambient/catalog.json. A sound's recordings are files/<id>.ogg and
 files/<id>-2.ogg, files/<id>-3.ogg, ... in that order; its picture is files/<id>.jpg. Names, licences, credits and
-source pages already in the catalog are kept; a new recording gets empty ones to fill in (the app's build refuses a
-recording without its licence and page).
+source pages already in the catalog are kept, and so is each recording's name (shown in the app's open sound, as
+"White" or "Cafe" under Noise; empty: the sound's name and number); a new recording gets empty ones to fill in (the
+app's build refuses a recording without its licence and page).
 """
 import hashlib, json, os, re, sys
 
@@ -42,7 +43,7 @@ def main():
             s = old.get(name, {"file": name, "licence": "", "credit": "", "source": ""})
             s["bytes"] = os.path.getsize(path)
             s["sha256"] = digest(path)
-            samples.append({k: s.get(k, "") for k in ("file", "bytes", "sha256", "licence", "credit", "source")})
+            samples.append({k: s.get(k, "") for k in ("file", "name", "bytes", "sha256", "licence", "credit", "source")})
             if s.get("licence") not in ("CC0", "CC-BY", "Pixabay"):
                 problems.append(f"licence needed (CC0, CC-BY or Pixabay): {name}")
             if s.get("licence") == "CC-BY" and not s.get("credit"):
