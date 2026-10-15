@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Fills in STILL's ambient catalog from files/: each sound's recordings and picture, with their size and SHA-256.
+"""Fills in STILL's ambient catalog from files/: each planned recording's and picture's size and SHA-256.
 
 Usage: python3 make-catalog.py
-The catalog is the app's still/src/main/assets/ambient/catalog.json. A sound's recordings are files/<id>.ogg and
-files/<id>-2.ogg, files/<id>-3.ogg, ... in that order; its picture is files/<id>.jpg. Names, licences, credits and
-source pages already in the catalog are kept, and so is each recording's name (shown in the app's open sound, as
-"White" or "Cafe" under Noise; empty: the sound's name and number); a new recording gets empty ones to fill in (the
-app's build refuses a recording without its licence and page).
+The catalog is the app's still/src/main/assets/ambient/catalog.json. Since 2026-10-15 it plans every recording by
+name: each sound lists its slots (file, name, weather), as "rain-soft.ogg" (Soft) under Rain; put a recording in
+files/ under its slot's file name and run this. A slot with its file gets its size and checksum (the app then offers
+it); one without stays planned (size 0, not offered). Licences, credits and source pages already in the catalog are
+kept; what still needs one is listed. A sound's picture is files/<id>.jpg. A file in files/ that no slot names is
+listed too: add a slot for it to the catalog first.
 """
 import hashlib, json, os, re, sys
 
@@ -21,12 +22,6 @@ def digest(path):
             h.update(block)
     return h.hexdigest()
 
-def recordings(sound_id, present):
-    """The sound's recordings in files/, the plain name first, then by number."""
-    pattern = re.compile(re.escape(sound_id) + r"(?:-(\d+))?\.ogg$")
-    found = [(int(m.group(1) or 1), name) for name in present for m in [pattern.fullmatch(name)] if m]
-    return [name for _, name in sorted(found)]
-
 def main():
     with open(CATALOG, encoding="utf-8") as f:
         catalog = json.load(f)
@@ -35,23 +30,26 @@ def main():
     problems = []
     for sound in catalog["sounds"]:
         sid = sound["id"]
-        old = {s["file"]: s for s in sound.get("samples", [])}
         samples = []
-        for name in recordings(sid, present):
+        for slot in sound.get("samples", []):
+            name = slot["file"]
             known.add(name)
             path = os.path.join(FILES, name)
-            s = old.get(name, {"file": name, "licence": "", "credit": "", "source": ""})
-            s["bytes"] = os.path.getsize(path)
-            s["sha256"] = digest(path)
-            samples.append({k: s.get(k, "") for k in ("file", "name", "bytes", "sha256", "licence", "credit", "source")})
-            if s.get("licence") not in ("CC0", "CC-BY", "Pixabay"):
-                problems.append(f"licence needed (CC0, CC-BY or Pixabay): {name}")
-            if s.get("licence") == "CC-BY" and not s.get("credit"):
-                problems.append(f"credit needed (CC-BY): {name}")
-            if not s.get("source"):
-                problems.append(f"source page needed: {name}")
-        for gone in sorted(set(old) - {s["file"] for s in samples}):
-            problems.append(f"no longer in files/, left out: {gone} ({sid})")
+            s = dict(slot)
+            if os.path.isfile(path):
+                s["bytes"] = os.path.getsize(path)
+                s["sha256"] = digest(path)
+                if s.get("licence") not in ("CC0", "CC-BY", "Pixabay"):
+                    problems.append(f"licence needed (CC0, CC-BY or Pixabay): {name}")
+                if s.get("licence") == "CC-BY" and not s.get("credit"):
+                    problems.append(f"credit needed (CC-BY): {name}")
+                if not s.get("source"):
+                    problems.append(f"source page needed: {name}")
+            else:
+                s["bytes"] = 0
+                s["sha256"] = ""
+            keys = ["file", "name", "bytes", "sha256", "licence", "credit", "source"] + (["weather"] if s.get("weather") else [])
+            samples.append({k: s.get(k, "") for k in keys})
         sound["samples"] = samples
         image = sound.get("image", "")
         known.add(image)
@@ -62,7 +60,7 @@ def main():
         else:
             sound["imageBytes"] = 0
             sound["imageSha256"] = ""
-        if not samples:
+        if not any(x["bytes"] for x in samples):
             problems.append(f"no recordings yet: {sid} (shows as Soon)")
     for extra in sorted(present - known):
         if not extra.startswith("."):
@@ -70,9 +68,10 @@ def main():
     with open(CATALOG, "w", encoding="utf-8") as f:
         json.dump(catalog, f, indent=2, ensure_ascii=False)
         f.write("\n")
-    ready = sum(1 for s in catalog["sounds"] if s["samples"])
-    total = sum(len(s["samples"]) for s in catalog["sounds"])
-    print(f"{ready} of {len(catalog['sounds'])} sounds ready, {total} recordings.")
+    ready = sum(1 for s in catalog["sounds"] if any(x["bytes"] for x in s["samples"]))
+    total = sum(1 for s in catalog["sounds"] for x in s["samples"] if x["bytes"])
+    planned = sum(len(s["samples"]) for s in catalog["sounds"])
+    print(f"{ready} of {len(catalog['sounds'])} sounds ready, {total} of {planned} planned recordings in.")
     for p in problems:
         print(" -", p)
     return 0
