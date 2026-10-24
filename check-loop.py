@@ -1,22 +1,35 @@
 #!/usr/bin/env python3
 """Does a loop's seam show? python3 check-loop.py file.ogg ...
 
-The file decoded once and put twice in a row (ffmpeg's own -stream_loop reopens an Opus file and leaves a hole of its
-own at the seam), high-passed at 3 kHz (where a click shows, and a dropout as a hole), in 2.5 ms
+The file played twice in a row as the app's player does, its decoder carrying on across the repeat (an Ogg Opus file:
+its packets twice in one stream, loop-opus.py --twice; anything else decoded once and put twice in a row; ffmpeg's
+own -stream_loop reopens the file and leaves a hole of its own at the seam), high-passed at 3 kHz (where a click shows, and a dropout as a hole), in 2.5 ms
 windows: the windows on the seam against all the others. A click is louder than nearly all of them, a dropout (the end
 fading out, as a plainly encoded Opus loop does) quieter than nearly all. Seen first on brown noise: a plain encoding's
 seam 4 dB under the quietest of the sound's own windows. Within the middle 99% of the sound's own windows, give or take
 1.5 dB (a 2.5 ms window of quiet highs varies that much by itself, before any encoding): even.
 """
-import math, struct, subprocess, sys
+import math, os, struct, subprocess, sys, tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+def twice(f):
+    """The file's sound twice in a row, mono 16-bit at 48 kHz."""
+    def pcm(path):
+        return subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-ac", "1", "-ar", "48000", "-f", "s16le", "-"], capture_output=True).stdout
+    if not f.endswith(".ogg"):
+        return pcm(f) * 2
+    with tempfile.TemporaryDirectory() as tmp:
+        doubled = os.path.join(tmp, "twice.ogg")
+        subprocess.run([sys.executable, "-I", os.path.join(HERE, "loop-opus.py"), "--twice", f, doubled], check=True)
+        return pcm(doubled)
 
 def main():
     bad = 0
     for f in sys.argv[1:]:
-        once = subprocess.run(["ffmpeg", "-v", "error", "-i", f, "-ac", "1", "-ar", "48000", "-f", "s16le", "-"], capture_output=True).stdout
         hp = ["ffmpeg", "-v", "error", "-f", "s16le", "-ar", "48000", "-ac", "1", "-i", "-",
               "-af", "highpass=f=3000:poles=2,highpass=f=3000:poles=2", "-f", "s16le", "-"]
-        d = subprocess.run(hp, input=once + once, capture_output=True).stdout
+        d = subprocess.run(hp, input=twice(f), capture_output=True).stdout
         x = struct.unpack("<%dh" % (len(d) // 2), d)
         n, w = len(x) // 2, 120
         def rms(i):

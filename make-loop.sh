@@ -19,11 +19,11 @@ LEN=$(python3 -c "print(min($LEN, round($DUR-$X-2.5, 1)))")
 START=$(python3 -I "$HERE/pick-loop.py" "$IN" "$LEN" "$X" "$MODE")
 CH=$(ffprobe -v error -select_streams a:0 -show_entries stream=channels -of csv=p=0 "$IN")
 # The two channels are not always as loud as each other. A recorder's first two of four (one rain: the right 11 dB
-# lower): the quieter is brought up to the other. A stereo file with one side all but empty (a fan: the left 24 dB
-# lower, so raising it would raise only hiss): the louder side alone, as mono.
+# lower): the quieter is brought up to the other. A file with one side all but empty, over 20 dB down (a fan: the
+# left 24 dB lower, so raising it would raise only hiss): the louder side alone, as mono.
 case "$CH" in 1) AF="anull";;
   *) read L R < <(ffmpeg -hide_banner -nostats -t 600 -i "$IN" -af "pan=stereo|c0=c0|c1=c1,astats=measure_overall=none:measure_perchannel=RMS_level" -f null - 2>&1 | awk '/RMS level dB/{printf "%s ", $NF}END{print ""}')
-     if python3 -c "import sys; sys.exit(0 if abs($L-$R)>10 else 1)"; then AF="pan=mono|c0=c$(python3 -c "print(0 if $L>$R else 1)")"
+     if python3 -c "import sys; sys.exit(0 if abs($L-$R)>20 else 1)"; then AF="pan=mono|c0=c$(python3 -c "print(0 if $L>$R else 1)")"
      elif [ "$CH" = 2 ]; then AF="anull"
      else AF="pan=stereo|c0=$(python3 -c "print(10**(max(0,$R-$L)/20))")*c0|c1=$(python3 -c "print(10**(max(0,$L-$R)/20))")*c1"; fi;;
 esac

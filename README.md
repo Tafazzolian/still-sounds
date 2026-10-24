@@ -30,11 +30,13 @@ licence, credit and page.
   `files/<name>.ogg` (give the planned name without .ogg, as `rain-soft`), then shows the loudness and the seam.
   A longer recording that is not a loop yet: `./make-loop.sh original.wav rain-soft [seconds] [calm|storm]` cuts its
   most even minute (`pick-loop.py`), cross-fades the end into the start and runs `prepare-sound.sh` on it.
-- **The seam**: a plainly encoded Opus loop clicks or drops out at every repeat (the encoder starts from silence, pads
-  the last frame, and the app's player does not trim the end). `loop-opus.py`, run by `prepare-sound.sh`, encodes it
-  with the loop's own sound on both sides and ends on a frame; a loop of whole 20 ms frames (960 samples, as
-  `make-loop.sh` cuts them) encodes the same on both sides of the seam. `python3 check-loop.py files/*.ogg` says
-  whether each seam is even, clicks or drops out.
+- **The seam**: a plainly encoded Opus loop clicks, drops out or jumps at every repeat: the encoder starts from
+  silence and pads the end, and the app's player repeats a file without starting its decoder afresh, so it drops no
+  pre-skip and trims no end on a repeat (v2 kept 100 ms of warm-up in the pre-skip, heard as a short jump each time).
+  `loop-opus.py`, run by `prepare-sound.sh`, encodes the loop four times in a row and keeps the third turn's packets,
+  with no pre-skip and nothing to trim, so repeated they are what the encoder made for the sound going on. The loop
+  must be whole 20 ms frames (960 samples), as `make-loop.sh` cuts them. `python3 check-loop.py files/*.ogg` plays
+  each file twice as the app does and says whether the seam is even, clicks or drops out.
 - **30–90 seconds, made to loop**: the end runs into the start without a click or a change in level (in Audacity:
   cross-fade the last two seconds into the first two, then cut). The app repeats the file.
 - **Even loudness**: normalise every file to about −23 LUFS so no sound is much louder than another.
@@ -84,5 +86,5 @@ checks every download against them, so a changed or broken file is never used), 
 offered), keeps the licences, credits and pages already there, and lists what still needs one, and files no slot names.
 
 Then publish: create the public repository `still-sounds`, commit `files/`, tag it `v1`, and make a GitHub release
-`v1` with the same files attached (the catalog is on `v2` since 2026-10-24). The catalog lists two mirrors, tried in order: the release, then jsDelivr
+`v1` with the same files attached (the catalog is on `v3` since 2026-10-25). The catalog lists two mirrors, tried in order: the release, then jsDelivr
 (which serves the tagged files). A new set of files gets a new tag (`v2`) and the catalog's mirrors move to it.
