@@ -7,7 +7,8 @@ name: each sound lists its slots (file, name, weather), as "rain-soft.ogg" (Soft
 files/ under its slot's file name and run this. A slot with its file gets its size and checksum (the app then offers
 it); one without stays planned (size 0, not offered). Licences, credits and source pages already in the catalog are
 kept; what still needs one is listed. A sound's picture is files/<id>.jpg. A file in files/ that no slot names is
-listed too: add a slot for it to the catalog first.
+listed too: add a slot for it to the catalog first. A file whose name holds "default" (2026-10-24, the listener) is
+its sound's default, played first when the sound starts; one a sound at most.
 """
 import hashlib, json, os, re, sys
 
@@ -39,18 +40,21 @@ def main():
             if os.path.isfile(path):
                 s["bytes"] = os.path.getsize(path)
                 s["sha256"] = digest(path)
-                if s.get("licence") not in ("CC0", "CC-BY", "Pixabay"):
-                    problems.append(f"licence needed (CC0, CC-BY or Pixabay): {name}")
-                if s.get("licence") == "CC-BY" and not s.get("credit"):
-                    problems.append(f"credit needed (CC-BY): {name}")
+                if s.get("licence") not in ("CC0", "CC-BY", "CC-BY-3.0", "Pixabay"):
+                    problems.append(f"licence needed (CC0, CC-BY, CC-BY-3.0 or Pixabay): {name}")
+                if s.get("licence", "").startswith("CC-BY") and not s.get("credit"):
+                    problems.append(f"credit needed ({s['licence']}): {name}")
                 if not s.get("source"):
                     problems.append(f"source page needed: {name}")
             else:
                 s["bytes"] = 0
                 s["sha256"] = ""
-            keys = ["file", "name", "bytes", "sha256", "licence", "credit", "source"] + (["weather"] if s.get("weather") else [])
+            s["default"] = "default" in name
+            keys = ["file", "name", "bytes", "sha256", "licence", "credit", "source"] + (["weather"] if s.get("weather") else []) + (["default"] if s["default"] else [])
             samples.append({k: s.get(k, "") for k in keys})
         sound["samples"] = samples
+        if sum(1 for x in samples if x.get("default")) > 1:
+            problems.append(f"more than one default: {sid}")
         image = sound.get("image", "")
         known.add(image)
         path = os.path.join(FILES, image)
