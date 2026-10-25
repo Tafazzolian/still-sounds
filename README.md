@@ -86,5 +86,5 @@ checks every download against them, so a changed or broken file is never used), 
 offered), keeps the licences, credits and pages already there, and lists what still needs one, and files no slot names.
 
 Then publish: create the public repository `still-sounds`, commit `files/`, tag it `v1`, and make a GitHub release
-`v1` with the same files attached (the catalog is on `v4` since 2026-10-25: new Ocean and Rain pictures). The catalog lists two mirrors, tried in order: the release, then jsDelivr
+`v1` with the same files attached (the catalog is on `v5` since 2026-10-25: new Ocean and Rain pictures, the rain one cleaned in v5). The catalog lists two mirrors, tried in order: the release, then jsDelivr
 (which serves the tagged files). A new set of files gets a new tag (`v2`) and the catalog's mirrors move to it.
