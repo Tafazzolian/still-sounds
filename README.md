@@ -11,12 +11,12 @@ The app's catalog (`still/src/main/assets/ambient/catalog.json`) plans every rec
 
 | Sound (id) | Recordings (file → name in the app; **default** plays first) | Picture |
 |---|---|---|
-| Rain (`rain`) | **`rain-distant-thunder-default-garybran.ogg` Distant thunder (storm)** · `rain-soft.ogg` Soft · `rain-rooftop-simonspiers.ogg` On the rooftop | `rain.jpg` (Nick Nice (Unsplash)) |
-| Ocean (`waves`) | **`ocean-beach-default.ogg` Beach** · `ocean-ship-seagulls.ogg` Ship and seagulls · `ocean-waves.ogg` Waves | `waves.jpg` (Ivan Bandura (Unsplash)) |
+| Rain (`rain`) | **`rain-distant-thunder-default-garybran.ogg` Distant thunder (storm)** · `rain-soft.ogg` Soft · `rain-rooftop-simonspiers.ogg` On the rooftop | `rain.jpg` (Colin Lloyd (Unsplash))) |
+| Ocean (`waves`) | **`ocean-beach-default.ogg` Beach** · `ocean-ship-seagulls.ogg` Ship and seagulls · `ocean-waves.ogg` Waves | `waves.jpg` (Mark Kassinos (Unsplash))) |
 | Night (`night`) | **`night-crickets-default.ogg` Crickets** · `night-crickets.ogg` Back porch · `night-city.ogg` City | `night.jpg` (Unsplash) |
-| Forest (`forest`) | **`forest-birds-default.ogg` Nightingale** · `forest-birds.ogg` Spring birds · `forest-rain.ogg` Rain · `forest-river.ogg` River · `forest-stream.ogg` Stream | `forest.jpg` (Andrew A (Unsplash)) |
-| Fireplace (`fireplace`) | **`fireplace-default.ogg`** · `fireplace-rain.ogg` Rain outside | `fireplace.jpg` (Karel Mistrik (Unsplash)) |
-| Noise (`noise`) | **`noise-brown-default.ogg` Brown** · `noise-fridge.ogg` Fridge · `noise-old-clock.ogg` Old clock · `noise-street.ogg` Street · `noise-wind.ogg` Wind · `noise-fan.ogg` Fan · `noise-large-fan.ogg` Large fan | `noise.jpg` (Jeremy Bishop (Unsplash)) |
+| Forest (`forest`) | **`forest-birds-default.ogg` Nightingale** · `forest-birds.ogg` Spring birds · `forest-rain.ogg` Rain · `forest-river.ogg` River · `forest-stream.ogg` Stream | `forest.jpg` (Andrew A (Unsplash))) |
+| Fireplace (`fireplace`) | **`fireplace-default.ogg`** · `fireplace-rain.ogg` Rain outside | `fireplace.jpg` (Karel Mistrik (Unsplash))) |
+| Noise (`noise`) | **`noise-brown-default.ogg` Brown** · `noise-fridge.ogg` Fridge · `noise-old-clock.ogg` Old clock · `noise-street.ogg` Street · `noise-wind.ogg` Wind · `noise-fan.ogg` Fan · `noise-large-fan.ogg` Large fan | `noise.jpg` (Jeremy Bishop (Unsplash))) |
 
 The app downloads a sound's recordings together, plays its default first (the file named `-default`; make-catalog.py marks it), then another at random on next or previous (never the same twice in a row); the open sound (long press) lists them by name. A recording made for a weather says so
 (`"weather": "storm"` on Distant thunder): in a storm the sound for the moment picks it. Another recording or sound: add its slot (file, name) to the catalog first. Each recording has its own
@@ -86,5 +86,5 @@ checks every download against them, so a changed or broken file is never used), 
 offered), keeps the licences, credits and pages already there, and lists what still needs one, and files no slot names.
 
 Then publish: create the public repository `still-sounds`, commit `files/`, tag it `v1`, and make a GitHub release
-`v1` with the same files attached (the catalog is on `v3` since 2026-10-25). The catalog lists two mirrors, tried in order: the release, then jsDelivr
+`v1` with the same files attached (the catalog is on `v4` since 2026-10-25: new Ocean and Rain pictures). The catalog lists two mirrors, tried in order: the release, then jsDelivr
 (which serves the tagged files). A new set of files gets a new tag (`v2`) and the catalog's mirrors move to it.
